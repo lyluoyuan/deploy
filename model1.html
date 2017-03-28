@@ -1,0 +1,70 @@
+     1	<html>
+     2	<head>
+     3	<script>
+     4	window.onload = function () {
+     5		var oBtn = document.getElementById('createBtn');
+     6		oBtn.onclick = function () {
+     7			var textarea = document.getElementById('inputText');
+     8			var text = textarea.value
+     9			text = text.replace(/[ ]+/g, function(){
+    10				return '';
+    11			});
+    12			var reg = ',\n';
+    13			var arr = text.split(reg);
+    14			var resultStr = "";
+    15			var propertyString = "";
+    16			for (var i = 0; i < arr.length; i++) {
+    17				var eArr = arr[i].split(/\":/g);
+    18				var left = eArr[0].replace(/\"/g,function(){
+    19					return '';
+    20				});
+    21				var right = eArr[1];
+    22				var type = ".stringValue";
+    23				var initialValue = '\"\"';
+    24				if (/^(-|\+)?\d+$/.test(right)){
+    25					type = ".intValue";
+    26					initialValue = '0';
+    27				}
+    28				if (/^(-|\+)?\d*\.\d*$/.test(right)){
+    29					type = ".doubleValue";
+    30					initialValue = '0.0';
+    31				}
+    32	
+    33				var upLeft = left.replace(/_./g, function(m){				
+    34					return m.substring(1,m.length).toUpperCase();
+    35				});
+    36	
+    37				var eResultStr = "  " + upLeft + " =" + " data[" + '\"' + left + '\"' + "]" + type;
+    38				resultStr += eResultStr;
+    39				if (i != arr.length-1){
+    40					resultStr += "\n";
+    41				}
+    42				propertyString += eResultStr.replace(/(=.*$)|(=.*\n)/g, function(m){
+    43					if (/\n$/.test(m)){
+    44						return "= " + initialValue +"\n";
+    45					}else{
+    46						return "= " + initialValue;
+    47					}
+    48				});
+    49				if (i != arr.length-1){
+    50					propertyString += "\n";
+    51				}
+    52			};
+    53			propertyString = propertyString.replace(/^|\n/g, function(m){
+    54				return "\nvar";
+    55			});
+    56			propertyString = propertyString + "\ninit(_ data : JSON){\n";
+    57			propertyString = propertyString + resultStr + "\n}";
+    58			textarea.value = propertyString;
+    59		};
+    60	}
+    61	</script>
+    62	</head>
+    63	<body>
+    64	<input type="button" value="create" id="createBtn"></input>
+    65	</br>
+    66	<textarea name="inputText" style='width:600px;height:600px' id='inputText'>"user_id"  :  "1",
+    67	"name":"ly",
+    68	"c_la":30.9</textarea>
+    69	</body>
+    70	</html>
